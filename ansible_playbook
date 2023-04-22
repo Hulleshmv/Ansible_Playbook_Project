@@ -1,0 +1,34 @@
+---
+- name: Install Tomcat on Ubuntu servers
+  hosts: ubuntu-servers
+  become: yes
+
+  tasks:
+  - name: Update package cache and install Java
+    apt:
+      update_cache: yes
+      name: default-jdk
+
+  - name: Download Tomcat archive
+    get_url:
+      url: "http://mirror.olnevhost.net/pub/apache/tomcat/tomcat-9/v9.0.54/bin/apache-tomcat-9.0.54.tar.gz"
+      dest: "/tmp/"
+
+  - name: Extract Tomcat archive
+    unarchive:
+      src: "/tmp/apache-tomcat-9.0.54.tar.gz"
+      dest: "/opt/"
+      remote_src: yes
+
+  - name: Set owner and group permissions
+    file:
+      path: "/opt/apache-tomcat-9.0.54"
+      state: directory
+      owner: tomcat
+      group: tomcat
+
+  - name: Start Tomcat service
+    service:
+      name: tomcat
+      state: started
+      enabled: yes
